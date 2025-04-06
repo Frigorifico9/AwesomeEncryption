@@ -1,0 +1,19 @@
+1001000 1100101
+['LL', 'LL', 'LT', 'TL', 'TS']
+2838532
+10010001
+
+The equation for the constellation LLLLLTTLTS is a_n = (729/131072) * a_0 + (-207/256)
+The solutions are: a_0 = 131072 * b + 118272, a_n = 729 * b + 657
+Finally, using b = (0/1) we find that one example of this constellation is: [2838532, 2128900, 1596676, 1197508, 898132, 673600, 168400, 42100, 31576, 7894]
+
+
+
+
+The equation for TLST is a_n = (9/32) * a_0 + (	)
+Solutions: a_0 = 32 * b + 21, a_n = 9 * b + -6
+With b = (0/1), nodes are: [520, 130, 94, 148]
+
+The equation for the constellation TLST is a_n = (9/32) * a_0 + (-3/8)
+The solutions are: a_0 = 32 * b + 12, a_n = 9 * b + 3
+Finally, using b = (0/1) we find that one example of this constellation is: [304, 76, 58, 88]

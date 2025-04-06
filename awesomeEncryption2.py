@@ -1,5 +1,4 @@
-# Convert image to binary string
-import constellationFinder as cf
+import newConstellationFinder as ncf
 
 def textToBinary(text):
     return ' '.join(format(ord(c),'b') for c in text)
@@ -39,7 +38,6 @@ def binaryToConstellation(binaryString):
     return constellation
 
 def constellationToBinary(constellation):
-    print(constellation)
     conversionDictionary = {'TT':0, 'TL':1, 'TS':2, 'LT':3, 'LL':4, 'LS':5, 'ST':6,
                             'SL':7}
     binaryString = ''
@@ -54,11 +52,11 @@ def constellationToBinary(constellation):
 
 def findNode(constellation,b):
     constellationString = ''.join(constellation)
-    constant1,constant2 = cf.Threading(constellationString)
-    Solutions_a0 = cf.findASolutionAlt(constant1, constant2)[0]
-    currentNode = cf.Node(constellationString[0])
-    a0 = b * Solutions_a0[0] + Solutions_a0[1]
-    return 6*(a0 * currentNode.n1 + currentNode.n2).intPart+4
+    alpha, beta, gamma = ncf.Threading(constellationString)
+    solution_a0, solution_an = ncf.findSolution(alpha, beta, gamma)
+    currentNode = ncf.Vertex(constellationString[0])
+    a0 = b * solution_a0[0] + solution_a0[1]
+    return 6*(a0 * currentNode.n1 + currentNode.n2)+4
 
 def nextNode(n):
     nn = int(n//2)
@@ -71,23 +69,28 @@ def nextNode(n):
 
 def nodeToBinary(node):
     constellationString = ''
-    while (constellationString[::-1][0:3] != 'SSS'): #find stop signal
+    sStrikeCounter = 0
+    #while (constellationString[::-1][0:3] != 'SSS'): #find stop signal
+    while (sStrikeCounter != 3):  # find stop signal
         n = (node - 4) // 6
         if (n-1)%2 == 0:
             constellationString += 'S'
+            sStrikeCounter += 1
         elif (n-2)%4 == 0:
             constellationString += 'T'
+            sStrikeCounter = 0
         elif n%4 == 0:
             constellationString += 'L'
-        print(constellationString)
+            sStrikeCounter = 0
         node = nextNode(node)
     if len(constellationString)%2 == 0: #we avoid removing a legitimate final S
         constellationString = constellationString[0:len(constellationString) - 2]  # remove stop signal
     elif len(constellationString)%2 == 1:
         constellationString = constellationString[0:len(constellationString) - 3] #remove stop signal
     constellationList = [constellationString[i:i + 2] for i in range(0, len(constellationString), 2)]
+    #print(len(constellationList))
     rawBinary = constellationToBinary(constellationList)
-    return ' '.join(rawBinary[i:i+7] for i in range(0, len(rawBinary), 7))
+    return ''.join(rawBinary[i] for i in range(0, len(rawBinary)))
 
 def encrypt(node,sharedSecret):
     sign = int(node / abs(node))
@@ -108,9 +111,38 @@ def decrypt(node,sharedSecret):
             decrypted += message[i]
     return sign*int(decrypted)
 
+
+#step 1: image to binary
+print('Image to biary')
+binaryString = imageToBinary('/Users/fer/leaningManim/awesomeEncryption/encryptionTest.jpg')
+print(len(binaryString))
+
+#step 2: binary to constellation
+print('binary to constellation')
+constellation = binaryToConstellation(binaryString)
+print(len(constellation))
+
+#step 3: constellation to node
+print('constellation to number')
+node = findNode(constellation,0)
+print(len(str(bin(node))))
+
+#step 4: node to binary
+print('node to binary')
+newBinaryString = nodeToBinary(node)
+print(len(newBinaryString))
+
+#step 5: binary to image
+print('binary to image')
+binaryToImage(newBinaryString,'/Users/fer/leaningManim/awesomeEncryption/newEncryptionTest.JPG')
+
+'''
+b = 0
+keyChain = [['TTSS',83,b],['SSLT',97,b],['TLSL',17,b]]
+
 #step 1: text to binary
 print('textToBinary')
-binaryString = textToBinary('HEME')
+binaryString = textToBinary('ThisIsJustYetAnothereTest')
 print(binaryString)
 
 #step 2: Binary to Constellation
@@ -121,25 +153,26 @@ print(constellation)
 
 #step 3: Constellation to number
 print('findNode')
-node = findNode(constellation,cf.Fraction(0,1))
+node = findNode(constellation,0)
 print(node)
 
 #step 3.5: Encrpt node
 sharedSecret = '0000000000000000000000000000000000000000000'
 print('encrypt')
-encrypted = encrypt(node,sharedSecret)
-print(encrypted)
+#encrypted = encrypt(node,sharedSecret)
+#print(encrypted)
 
 #step 3.6: Decrypt node
 print('decrypt')
-decrypted = decrypt(encrypted,sharedSecret)
-print(decrypted)
+#decrypted = decrypt(encrypted,sharedSecret)
+#print(decrypted)
 
 #step 4: Number to binary
 print('nodeToBinary')
-binaryString = nodeToBinary(decrypted)
+binaryString = nodeToBinary(node)
 print(binaryString)
 
 #step 5: Binary to string
 text = binaryToText(binaryString)
 print(text)
+'''
